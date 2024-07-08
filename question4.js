@@ -1,3 +1,5 @@
+const readline = require("readline");
+
 const dictionary = [
   "lake",
   "hair",
@@ -11,7 +13,8 @@ const dictionary = [
   "hall",
   "sir",
   "menu",
-  "sonar",
+  "son",
+  "art",
   "exam",
   "city",
   "ad",
@@ -49,37 +52,39 @@ const dictionary = [
   "idea",
   "lab",
 ];
-const letters = prompt("Enter string of letters:").split("");
-const letterCounts = {};
 
-letters.forEach((letter) => {
-  letterCounts[letter] = (letterCounts[letter] || 0) + 1;
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
 });
 
-const matchingWords = [];
-dictionary.forEach((word) => {
-  const wordLetterCounts = {};
-  let canFormWord = true;
-  word.split("").forEach((letter) => {
-    wordLetterCounts[letter] = (wordLetterCounts[letter] || 0) + 1;
-    if (wordLetterCounts[letter] > (letterCounts[letter] || 0)) {
-      canFormWord = false;
+rl.question("Enter a string of letters: ", (input) => {
+  let letters = input.split("");
+  const validWords = [];
+
+  for (const word of dictionary) {
+    let lettersCopy = [...letters];
+    let isValidWord = true;
+    for (const letter of word) {
+      let letterIndex = lettersCopy.indexOf(letter);
+      if (letterIndex == -1) {
+        isValidWord = false;
+        break;
+      } else {
+        lettersCopy.splice(letterIndex, 1);
+      }
     }
-  });
-  if (canFormWord) {
-    matchingWords.push(word);
-    word.split("").forEach((letter) => {
-      letterCounts[letter]--;
-    });
+    if (isValidWord) {
+      validWords.push(word);
+      letters = [...lettersCopy];
+    }
   }
-});
 
-const unusedLetters = [];
-Object.keys(letterCounts).forEach((letter) => {
-  for (let i = 0; i < letterCounts[letter]; i++) {
-    unusedLetters.push(letter);
-  }
-});
+  console.log(
+    `Matching words are [${validWords}] unused letters are ‘${letters.join(
+      ""
+    )}’.`
+  );
 
-console.log(`Matching words are: ${matchingWords.join(", ")}`);
-console.log(`Unused letters are: ${unusedLetters.join("")}`);
+  rl.close();
+});
